@@ -155,10 +155,34 @@
         }
         
         .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            accent-color: #FFFFFF;
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            cursor: pointer;
+            /* iOS Safari friendly styling */
+            -webkit-appearance: none;
+            appearance: none;
+            border: 2px solid #FFFFFF;
+            border-radius: 4px;
+            background-color: #1a1a1a;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: #d7ff43;
+            border-color: #d7ff43;
+        }
+        
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: #000;
+            font-size: 18px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .checkbox-group label {
@@ -706,10 +730,15 @@
             }
             message += `\n---\nSaya setuju dengan ketentuan booking yang berlaku.`;
             
-            // Open WhatsApp
+            // Open WhatsApp - iOS Safari fix with timeout
             const encodedMessage = encodeURIComponent(message);
             const waNumber = '6289623290398'; // RPXLABS WhatsApp
-            window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
+            const waUrl = `https://wa.me/${waNumber}?text=${encodedMessage}`;
+            
+            // iOS Safari: use location.href for more reliable redirect
+            setTimeout(() => {
+                window.location.href = waUrl;
+            }, 500);
             
             // Reset form
             showAlert('✅ Data tersimpan! Silakan lanjutkan konfirmasi via WhatsApp.', 'success');
