@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPXLABS Graduation Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #111111;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(40, 212, 95, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #FFFFFF;
+            margin-bottom: 5px;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin: 0;
+            color: #ccc;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            margin: 25px 0 15px;
+            color: #FFFFFF;
+            border-bottom: 2px solid #FFFFFF;
+            padding-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #FFFFFF;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .package-card {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .package-card.active {
+            display: block;
+            border-color: #FFFFFF;
+            max-height: 1000px;
+            overflow: visible;
+        }
+        
+        .package-card h3 {
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        
+        .package-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .package-card li {
+            padding: 4px 0;
+            font-size: 13px;
+            color: #ccc;
+        }
+        
+        .package-card li::before {
+            content: "• ";
+            color: #FFFFFF;
+            font-weight: bold;
+        }
+        
+        .addon-group {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            accent-color: #FFFFFF;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            flex: 1;
+        }
+        
+        .price-summary {
+            background: #1a1a1a;
+            border: 2px solid #FFFFFF;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .price-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFFFFF;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+            margin-top: 10px;
+        }
+        
+        .terms {
+            background: #1a1a1a;
+            border-left: 3px solid #FFFFFF;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 13px;
+            color: #ccc;
+        }
+        
+        .terms h3 {
+            color: #FFFFFF;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .terms ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .terms li {
+            padding: 3px 0;
+        }
+        
+        .payment-info {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+        
+        .payment-info h3 {
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        
+        .payment-method {
+            background: #111111;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-family: monospace;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #FFFFFF;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: #d7ff43;
+        }
+        
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background: #1a3a1a;
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+        
+        .alert-error {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .required {
+            color: #ff4444;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">RPXLABS</div>
+            <h1>Graduation Booking Form</h1>
+        </div>
+        
+        <form id="bookingForm">
+            <h2>📋 Data Client</h2>
+            
+            <div class="form-group">
+                <label>Nama Lengkap <span class="required">*</span></label>
+                <input type="text" id="nama" name="nama" required placeholder="Masukkan nama lengkap">
+            </div>
+            
+            <div class="form-group">
+                <label>Nomor WhatsApp <span class="required">*</span></label>
+                <input type="tel" id="whatsapp" name="whatsapp" required placeholder="08xxxxxxxxxx">
+            </div>
+            
+            <div class="form-group">
+                <label>Email (Opsional)</label>
+                <input type="email" id="email" name="email" placeholder="email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Instagram (Opsional)</label>
+                <input type="text" id="instagram" name="instagram" placeholder="@username">
+            </div>
+            
+            <h2>📸 Detail Sesi</h2>
+            
+            <div class="form-group">
+                <label>Universitas <span class="required">*</span></label>
+                <input type="text" id="universitas" name="universitas" required placeholder="Nama universitas">
+            </div>
+            
+            <div class="form-group">
+                <label>Lokasi Foto <span class="required">*</span></label>
+                <input type="text" id="lokasi" name="lokasi" required placeholder="Contoh: Kampus utama, Auditorium, dll">
+            </div>
+            
+            <div class="form-group">
+                <label>Tanggal Sesi <span class="required">*</span></label>
+                <input type="date" id="tanggal" name="tanggal" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Jam Mulai <span class="required">*</span></label>
+                <input type="time" id="jam" name="jam" required>
+            </div>
+            
+            <h2>📦 Paket & Harga</h2>
+            
+            <div class="form-group">
+                <label>Pilih Paket <span class="required">*</span></label>
+                <select id="paket" name="paket" required>
+                    <option value="">-- Pilih Paket --</option>
+                    <option value="silver" data-price="450000">Silver - Rp 450.000</option>
+                    <option value="gold" data-price="600000">Gold - Rp 600.000</option>
+                    <option value="platinum" data-price="750000">Platinum - Rp 750.000</option>
+                    <option value="bestie" data-price="800000">Bestie Graduation - Rp 800.000</option>
+                </select>
+            </div>
+            
+            <!-- Package Details -->
+            <div id="package-silver" class="package-card">
+                <h3>Silver Package - Rp 450.000</h3>
+                <ul>
+                    <li>1 Graduate</li>
+                    <li>15 Edited Photos (Premium Color Tone)</li>
+                    <li>All Original Photos Included</li>
+                    <li>1 Spot Location</li>
+                    <li>Unlimited Shoots & Poses</li>
+                    <li>Session duration up to 60 minutes</li>
+                    <li>Google Drive Delivery</li>
+                    <li>3-5 Days</li>
+                </ul>
+            </div>
+            
+            <div id="package-gold" class="package-card">
+                <h3>Gold Package - Rp 600.000</h3>
+                <ul>
+                    <li>1 Graduate</li>
+                    <li>Family/friend (Max 4 People)</li>
+                    <li>25 Edited Photos (Premium Retouch)</li>
+                    <li>All Original Photos Included</li>
+                    <li>Session duration up to 90 minutes</li>
+                    <li>Unlimited Shoots & Poses</li>
+                    <li>1 Spot Location</li>
+                    <li>Google Drive Delivery</li>
+                    <li>3-5 Days</li>
+                </ul>
+            </div>
+            
+            <div id="package-platinum" class="package-card">
+                <h3>Platinum Package - Rp 750.000</h3>
+                <ul>
+                    <li>1 Graduate</li>
+                    <li>Family/Friend (Max 8 People)</li>
+                    <li>50 Edited Photos (Premium Retouch & Color)</li>
+                    <li>All Original Photos Included</li>
+                    <li>Unlimited Shoots & Poses</li>
+                    <li>Multiple Spots</li>
+                    <li>Session duration up to 120 minutes</li>
+                    <li>Priority delivery</li>
+                    <li>Google Drive Delivery</li>
+                    <li>3-5 Days</li>
+                </ul>
+            </div>
+            
+            <div id="package-bestie" class="package-card">
+                <h3>Bestie Graduation - Rp 800.000</h3>
+                <ul>
+                    <li>2 Graduates</li>
+                    <li>35 Edited Photos (Premium Retouch)</li>
+                    <li>All Original Photos Included</li>
+                    <li>Session duration up to 90 minutes</li>
+                    <li>Unlimited Shoots & Poses</li>
+                    <li>Multiple Spots</li>
+                    <li>Google Drive Delivery</li>
+                    <li>3-5 Days</li>
+                </ul>
+            </div>
+            
+            <div class="form-group">
+                <label>Jumlah Orang yang Difoto <span class="required">*</span></label>
+                <input type="number" id="jumlahOrang" name="jumlahOrang" min="1" required placeholder="Jumlah orang">
+            </div>
+            
+            <h2>➕ Add-Ons</h2>
+            
+            <div class="addon-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="cinematic" name="cinematic" value="350000">
+                    <label for="cinematic">Cinematic Video (60 detik) - Rp 350.000</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="number" id="extraEdit" name="extraEdit" min="0" value="0" style="width: 80px; display: inline-block; margin-right: 10px;">
+                    <label for="extraEdit">Extra Edit Photo (Rp 15.000/foto)</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="number" id="extraPerson" name="extraPerson" min="0" value="0" style="width: 80px; display: inline-block; margin-right: 10px;">
+                    <label for="extraPerson">Additional Person (Rp 30.000/orang)</label>
+                </div>
+                
+                <div class="checkbox-group" id="extraGraduateGroup" style="display: none;">
+                    <input type="number" id="extraGraduate" name="extraGraduate" min="0" value="0" style="width: 80px; display: inline-block; margin-right: 10px;">
+                    <label for="extraGraduate">Additional Graduate - Rp 275.000/orang (Only Bestie Package)</label>
+                </div>
+            </div>
+            
+            <div class="price-summary">
+                <div class="price-line">
+                    <span>Harga Paket:</span>
+                    <span id="packagePrice">Rp 0</span>
+                </div>
+                <div class="price-line" id="cinematicLine" style="display: none;">
+                    <span>Cinematic Video:</span>
+                    <span>Rp 350.000</span>
+                </div>
+                <div class="price-line" id="extraEditLine" style="display: none;">
+                    <span>Extra Edit (<span id="extraEditCount">0</span> foto):</span>
+                    <span id="extraEditPrice">Rp 0</span>
+                </div>
+                <div class="price-line" id="extraPersonLine" style="display: none;">
+                    <span>Extra Person (<span id="extraPersonCount">0</span> orang):</span>
+                    <span id="extraPersonPrice">Rp 0</span>
+                </div>
+                <div class="price-line" id="extraGraduateLine" style="display: none;">
+                    <span>Extra Graduate (<span id="extraGraduateCount">0</span> orang):</span>
+                    <span id="extraGraduatePrice">Rp 0</span>
+                </div>
+                <div class="price-total">
+                    <span>Total Harga:</span>
+                    <span id="totalPrice">Rp 0</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Catatan Tambahan</label>
+                <textarea id="catatan" name="catatan" placeholder="Catatan khusus atau request..."></textarea>
+            </div>
+            
+            <div class="terms">
+                <h3>📌 Ketentuan Booking</h3>
+                <ul>
+                    <li>• Jadwal di-lock setelah DP diterima</li>
+                    <li>• DP minimal Rp 150.000 dan bersifat non-refund</li>
+                    <li>• Sisa pembayaran setelah sesi foto selesai</li>
+                    <li>• Biaya izin lokasi ditanggung client</li>
+                    <li>• Perubahan jadwal mengikuti ketersediaan RPXLABS</li>
+                    <li>• Foto dikirim melalui Google Drive (estimasi 3-5 hari)</li>
+                    <li>• Link Google Drive aktif 14 hari sejak dikirim, lalu file dihapus</li>
+                    <li>• Pembatalan setelah pembayaran: DP tidak dapat dikembalikan</li>
+                </ul>
+            </div>
+            
+            <div class="payment-info">
+                <h3>💳 Metode Pembayaran DP</h3>
+                <div class="payment-method">
+                    <strong>QRIS:</strong> Cek di Bio Instagram
+                </div>
+                <div class="payment-method">
+                    <strong>BCA:</strong> 6695401021<br>
+                    a/n A. Rifko Perdana Putra
+                </div>
+            </div>
+            
+            <div class="checkbox-group" style="margin: 20px 0;">
+                <input type="checkbox" id="agree" name="agree" required>
+                <label for="agree">Saya setuju dengan ketentuan booking di atas <span class="required">*</span></label>
+            </div>
+            
+            <div id="alertContainer"></div>
+            
+            <button type="submit" class="btn" id="submitBtn">Kirim Booking</button>
+        </form>
+    </div>
+    
+    <script>
+        // KONFIGURASI: Google Apps Script Web App URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSnf9OtA74ocXn5OyMgbJ_iFmRhXGuhqbbuhaHorQ_KGeS07YWrH_AVHUATK7vwft_uA/exec';
+        
+        const form = document.getElementById('bookingForm');
+        const paketSelect = document.getElementById('paket');
+        const cinematicCheck = document.getElementById('cinematic');
+        const extraEditInput = document.getElementById('extraEdit');
+        const extraPersonInput = document.getElementById('extraPerson');
+        const extraGraduateInput = document.getElementById('extraGraduate');
+        const extraGraduateGroup = document.getElementById('extraGraduateGroup');
+        const submitBtn = document.getElementById('submitBtn');
+        const alertContainer = document.getElementById('alertContainer');
+        
+        // Package selection handler
+        paketSelect.addEventListener('change', function() {
+            // Hide all package cards
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Show selected package card
+            if (this.value) {
+                document.getElementById('package-' + this.value).classList.add('active');
+            }
+            
+            // Show/hide extra graduate option for Bestie package
+            if (this.value === 'bestie') {
+                document.getElementById('extraGraduateGroup').style.display = 'flex';
+            } else {
+                document.getElementById('extraGraduateGroup').style.display = 'none';
+                extraGraduateInput.value = 0;
+            }
+            
+            calculateTotal();
+        });
+        
+        // Add-ons change handlers
+        cinematicCheck.addEventListener('change', calculateTotal);
+        extraEditInput.addEventListener('input', calculateTotal);
+        extraPersonInput.addEventListener('input', calculateTotal);
+        extraGraduateInput.addEventListener('input', calculateTotal);
+        
+        function calculateTotal() {
+            const selectedOption = paketSelect.options[paketSelect.selectedIndex];
+            const packagePrice = parseInt(selectedOption.dataset.price) || 0;
+            
+            const cinematicPrice = cinematicCheck.checked ? 350000 : 0;
+            const extraEditCount = parseInt(extraEditInput.value) || 0;
+            const extraEditPrice = extraEditCount * 15000;
+            const extraPersonCount = parseInt(extraPersonInput.value) || 0;
+            const extraPersonPrice = extraPersonCount * 30000;
+            const extraGraduateCount = parseInt(extraGraduateInput.value) || 0;
+            const extraGraduatePrice = extraGraduateCount * 275000;
+            
+            const total = packagePrice + cinematicPrice + extraEditPrice + extraPersonPrice + extraGraduatePrice;
+            
+            // Update display
+            document.getElementById('packagePrice').textContent = formatRupiah(packagePrice);
+            
+            // Show/hide cinematic line
+            if (cinematicCheck.checked) {
+                document.getElementById('cinematicLine').style.display = 'flex';
+            } else {
+                document.getElementById('cinematicLine').style.display = 'none';
+            }
+            
+            // Show/hide extra edit line
+            if (extraEditCount > 0) {
+                document.getElementById('extraEditLine').style.display = 'flex';
+                document.getElementById('extraEditCount').textContent = extraEditCount;
+                document.getElementById('extraEditPrice').textContent = formatRupiah(extraEditPrice);
+            } else {
+                document.getElementById('extraEditLine').style.display = 'none';
+            }
+            
+            // Show/hide extra person line
+            if (extraPersonCount > 0) {
+                document.getElementById('extraPersonLine').style.display = 'flex';
+                document.getElementById('extraPersonCount').textContent = extraPersonCount;
+                document.getElementById('extraPersonPrice').textContent = formatRupiah(extraPersonPrice);
+            } else {
+                document.getElementById('extraPersonLine').style.display = 'none';
+            }
+            
+            // Show/hide extra graduate line
+            if (extraGraduateCount > 0) {
+                document.getElementById('extraGraduateLine').style.display = 'flex';
+                document.getElementById('extraGraduateCount').textContent = extraGraduateCount;
+                document.getElementById('extraGraduatePrice').textContent = formatRupiah(extraGraduatePrice);
+            } else {
+                document.getElementById('extraGraduateLine').style.display = 'none';
+            }
+            
+            document.getElementById('totalPrice').textContent = formatRupiah(total);
+        }
+        
+        function formatRupiah(number) {
+            return 'Rp ' + number.toLocaleString('id-ID');
+        }
+        
+        function showAlert(message, type) {
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mengirim...';
+            
+            const formData = {
+                timestamp: new Date().toISOString(),
+                nama: document.getElementById('nama').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                email: document.getElementById('email').value,
+                instagram: document.getElementById('instagram').value,
+                universitas: document.getElementById('universitas').value,
+                lokasi: document.getElementById('lokasi').value,
+                tanggal: document.getElementById('tanggal').value,
+                jam: document.getElementById('jam').value,
+                paket: paketSelect.options[paketSelect.selectedIndex].text,
+                jumlahOrang: document.getElementById('jumlahOrang').value,
+                cinematicVideo: cinematicCheck.checked ? 'Ya' : 'Tidak',
+                extraEdit: parseInt(extraEditInput.value) || 0,
+                extraPerson: parseInt(extraPersonInput.value) || 0,
+                extraGraduate: parseInt(extraGraduateInput.value) || 0,
+                totalHarga: document.getElementById('totalPrice').textContent,
+                catatan: document.getElementById('catatan').value
+            };
+            
+            // Simpan ke Google Sheets (jika sudah dikonfigurasi)
+            if (GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                } catch (error) {
+                    console.log('Google Sheets error:', error);
+                }
+            }
+            
+            // Compose WhatsApp message
+            let message = `Halo RPXLABS! 👋\n\n`;
+            message += `📋 *FORM BOOKING GRADUATION*\n\n`;
+            message += `*Data Client:*\n`;
+            message += `Nama: ${formData.nama}\n`;
+            message += `WhatsApp: ${formData.whatsapp}\n`;
+            if (formData.email) message += `Email: ${formData.email}\n`;
+            if (formData.instagram) message += `Instagram: ${formData.instagram}\n`;
+            message += `\n*Detail Sesi:*\n`;
+            message += `Universitas: ${formData.universitas}\n`;
+            message += `Lokasi Foto: ${formData.lokasi}\n`;
+            message += `Tanggal & Jam: ${formData.tanggal} pukul ${formData.jam}\n`;
+            message += `Jumlah Orang: ${formData.jumlahOrang}\n`;
+            message += `\n*Paket:*\n`;
+            message += `${formData.paket}\n`;
+            
+            // Add-ons
+            const addons = [];
+            if (formData.cinematicVideo === 'Ya') addons.push('Cinematic Video (60s)');
+            if (formData.extraEdit > 0) addons.push(`Extra Edit ${formData.extraEdit} foto`);
+            if (formData.extraPerson > 0) addons.push(`Extra ${formData.extraPerson} orang`);
+            if (formData.extraGraduate > 0) addons.push(`Extra ${formData.extraGraduate} graduate`);
+            
+            if (addons.length > 0) {
+                message += `\n*Add-Ons:*\n`;
+                addons.forEach(addon => message += `• ${addon}\n`);
+            }
+            
+            message += `\n*Total Harga: ${formData.totalHarga}*\n`;
+            message += `DP Minimal: Rp 150.000\n`;
+            if (formData.catatan) {
+                message += `\nCatatan: ${formData.catatan}\n`;
+            }
+            message += `\n---\nSaya setuju dengan ketentuan booking yang berlaku.`;
+            
+            // Open WhatsApp
+            const encodedMessage = encodeURIComponent(message);
+            const waNumber = '6289623290398'; // RPXLABS WhatsApp
+            window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
+            
+            // Reset form
+            showAlert('✅ Data tersimpan! Silakan lanjutkan konfirmasi via WhatsApp.', 'success');
+            setTimeout(() => {
+                form.reset();
+                calculateTotal();
+            }, 1000);
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Kirim Booking';
+        });
+    </script>
+</body>
+</html>
