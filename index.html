@@ -584,8 +584,9 @@
             <div class="form-group">
                 <label>Nominal DP (Down Payment) <span class="required">*</span></label>
                 <input type="text" id="nominalDP" name="nominalDP" required placeholder="Contoh: 150000">
-                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 4px;">
-                    💳 DP minimal Rp 150.000 (non-refund). Kirimkan bukti pembayaran via WhatsApp setelah mengisi form ini.
+                <div id="dpLimitWarning" style="display: none; background: rgba(231, 76, 60, 0.15); color: #ff8b80; padding: 10px 12px; margin-top: 8px; font-size: 12px; border-radius: 6px; border: 1px solid rgba(231, 76, 60, 0.4); border-left: 3px solid #e74c3c;"></div>
+                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 6px;">
+                    💳 DP minimal Rp 150.000 (non-refund) dan maksimal sebesar total harga paket. Kirimkan bukti pembayaran via WhatsApp setelah mengisi form ini.
                 </small>
             </div>
             
@@ -938,17 +939,73 @@
         // Jumlah orang input handler - REALTIME VALIDATION + CALC
         document.getElementById('jumlahOrang').addEventListener('input', calculateTotal);
         
-        // Nominal DP input handler - format rupiah + calc remaining
-        const nominalDPInput = document.getElementById('nominalDP');
-        nominalDPInput.addEventListener('input', function(e) {
-            // Remove non-digit
-            let value = this.value.replace(/\D/g, '');
+        // Helper hitung total harga saat ini
+        function getCurrentTotalPrice() {
+            const selectedOption = paketSelect.options[paketSelect.selectedIndex];
+            const packagePrice = parseInt(selectedOption?.dataset?.price) || 0;
+            const packageMaxPeople = parseInt(selectedOption?.getAttribute('data-max-people')) || 1;
+            const jumlahOrangInput = parseInt(document.getElementById('jumlahOrang').value) || 1;
+            const isBestie = paketSelect.value === 'bestie';
+            const extraOrang = Math.max(0, jumlahOrangInput - packageMaxPeople);
             
-            // Format dengan separator ribuan
-            if (value) {
-                this.value = parseInt(value).toLocaleString('id-ID');
+            let extraPersonPrice = 0;
+            let extraGraduatePrice = 0;
+            if (isBestie) {
+                extraGraduatePrice = extraOrang * 275000;
+            } else {
+                extraPersonPrice = extraOrang * 30000;
             }
             
+            const cinematicPrice = cinematicCheck.checked ? 350000 : 0;
+            const extraEditCount = parseInt(extraEditInput.value) || 0;
+            const extraEditPrice = extraEditCount * 15000;
+            
+            return packagePrice + cinematicPrice + extraEditPrice + extraPersonPrice + extraGraduatePrice;
+        }
+
+        // Nominal DP input handler - format rupiah, cap limit max total, calc remaining
+        const nominalDPInput = document.getElementById('nominalDP');
+        const dpLimitWarning = document.getElementById('dpLimitWarning');
+
+        function enforceDPLimit() {
+            const rawDigits = nominalDPInput.value.replace(/\D/g, '');
+            if (!rawDigits) {
+                if (dpLimitWarning) dpLimitWarning.style.display = 'none';
+                return;
+            }
+            let val = parseInt(rawDigits);
+            const maxAllowed = getCurrentTotalPrice();
+            
+            if (maxAllowed > 0 && val > maxAllowed) {
+                val = maxAllowed;
+                nominalDPInput.value = val.toLocaleString('id-ID');
+                if (dpLimitWarning) {
+                    dpLimitWarning.textContent = `⚠️ Nominal DP tidak boleh melebihi total harga (Maksimal Rp ${maxAllowed.toLocaleString('id-ID')}). Otomatis disesuaikan.`;
+                    dpLimitWarning.style.display = 'block';
+                }
+            } else if (dpLimitWarning) {
+                dpLimitWarning.style.display = 'none';
+            }
+        }
+
+        nominalDPInput.addEventListener('input', function(e) {
+            let raw = this.value.replace(/\D/g, '');
+            if (raw) {
+                let num = parseInt(raw);
+                const currentTotal = getCurrentTotalPrice();
+                if (currentTotal > 0 && num > currentTotal) {
+                    num = currentTotal;
+                    if (dpLimitWarning) {
+                        dpLimitWarning.textContent = `⚠️ Nominal DP tidak boleh melebihi total harga (Maksimal Rp ${currentTotal.toLocaleString('id-ID')}). Otomatis disesuaikan.`;
+                        dpLimitWarning.style.display = 'block';
+                    }
+                } else if (dpLimitWarning) {
+                    dpLimitWarning.style.display = 'none';
+                }
+                this.value = num.toLocaleString('id-ID');
+            } else if (dpLimitWarning) {
+                dpLimitWarning.style.display = 'none';
+            }
             calculateTotal();
         });
         
@@ -957,12 +1014,14 @@
             this.value = this.value.replace(/\./g, '');
         });
         
-        // Re-format saat blur
+        // Re-format saat blur + enforce
         nominalDPInput.addEventListener('blur', function() {
-            let value = this.value.replace(/\D/g, '');
-            if (value) {
-                this.value = parseInt(value).toLocaleString('id-ID');
+            enforceDPLimit();
+            let raw = this.value.replace(/\D/g, '');
+            if (raw) {
+                this.value = parseInt(raw).toLocaleString('id-ID');
             }
+            calculateTotal();
         });
         
         function calculateTotal() {
@@ -1058,9 +1117,17 @@
             
             document.getElementById('totalPrice').textContent = formatRupiah(total);
             
-            // Calculate DP and remaining payment
-            const dpInputValue = document.getElementById('nominalDP').value;
-            const dpAmount = dpInputValue ? parseInt(dpInputValue.replace(/\D/g, '')) : 0;
+            // Enforce limit jika total paket berubah
+            let dpDigits = document.getElementById('nominalDP').value.replace(/\D/g, '');
+            let dpAmount = dpDigits ? parseInt(dpDigits) : 0;
+            if (total > 0 && dpAmount > total) {
+                dpAmount = total;
+                document.getElementById('nominalDP').value = dpAmount.toLocaleString('id-ID');
+                if (dpLimitWarning) {
+                    dpLimitWarning.textContent = `⚠️ Nominal DP disesuaikan dengan total harga baru (Maksimal Rp ${total.toLocaleString('id-ID')}).`;
+                    dpLimitWarning.style.display = 'block';
+                }
+            }
             
             if (dpAmount > 0) {
                 document.getElementById('dpPaymentLine').style.display = 'flex';
@@ -1093,6 +1160,26 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Mengirim...';
             
+            // Validasi DP: min 150k dan max total
+            const totalNumeric = parseInt(document.getElementById('totalPrice').textContent.replace(/\D/g, '')) || 0;
+            const dpNumeric = parseInt(document.getElementById('nominalDP').value.replace(/\D/g, '')) || 0;
+            
+            if (dpNumeric < 150000) {
+                showAlert('⚠️ Minimal pembayaran DP adalah Rp 150.000', 'error');
+                document.getElementById('nominalDP').focus();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Kirim Booking';
+                return;
+            }
+            
+            if (dpNumeric > totalNumeric) {
+                showAlert(`⚠️ Nominal DP tidak boleh melebihi total harga (Rp ${totalNumeric.toLocaleString('id-ID')})`, 'error');
+                document.getElementById('nominalDP').focus();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Kirim Booking';
+                return;
+            }
+
             // Get jam value (handle custom time)
             const selectedJam = document.getElementById('jam').value;
             let finalJam = selectedJam;
