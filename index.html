@@ -343,11 +343,6 @@
             </div>
             
             <div class="form-group">
-                <label>Email (Opsional)</label>
-                <input type="email" id="email" name="email" placeholder="email@example.com">
-            </div>
-            
-            <div class="form-group">
                 <label>Instagram (Opsional)</label>
                 <input type="text" id="instagram" name="instagram" placeholder="@username">
             </div>
@@ -380,10 +375,10 @@
                 <label>Pilih Paket <span class="required">*</span></label>
                 <select id="paket" name="paket" required>
                     <option value="">-- Pilih Paket --</option>
-                    <option value="silver" data-price="450000">Silver - Rp 450.000</option>
-                    <option value="gold" data-price="600000">Gold - Rp 600.000</option>
-                    <option value="platinum" data-price="750000">Platinum - Rp 750.000</option>
-                    <option value="bestie" data-price="800000">Bestie Graduation - Rp 800.000</option>
+                    <option value="silver" data-price="450000" data-max-people="1">Silver - Rp 450.000 (Max 1 orang)</option>
+                    <option value="gold" data-price="600000" data-max-people="5">Gold - Rp 600.000 (Max 5 orang)</option>
+                    <option value="platinum" data-price="750000" data-max-people="9">Platinum - Rp 750.000 (Max 9 orang)</option>
+                    <option value="bestie" data-price="800000" data-max-people="2">Bestie Graduation - Rp 800.000 (Max 2 wisudawan)</option>
                 </select>
             </div>
             
@@ -450,6 +445,7 @@
             <div class="form-group">
                 <label>Jumlah Orang yang Difoto <span class="required">*</span></label>
                 <input type="number" id="jumlahOrang" name="jumlahOrang" min="1" required placeholder="Jumlah orang">
+                <div id="maxPeopleWarning" style="display: none; background: #2a2a1a; color: #d7ff43; padding: 10px; margin-top: 8px; font-size: 12px; border-left: 3px solid #d7ff43; border-radius: 3px;"></div>
             </div>
             
             <h2>➕ Add-Ons</h2>
@@ -465,7 +461,7 @@
                     <label for="extraEdit">Extra Edit Photo (Rp 15.000/foto)</label>
                 </div>
                 
-                <div class="checkbox-group">
+                <div class="checkbox-group" id="extraPersonGroup">
                     <input type="number" id="extraPerson" name="extraPerson" min="0" value="0" style="width: 80px; display: inline-block; margin-right: 10px;">
                     <label for="extraPerson">Additional Person (Rp 30.000/orang)</label>
                 </div>
@@ -546,7 +542,7 @@
     
     <script>
         // KONFIGURASI: Google Apps Script Web App URL
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz45aF-kvNZhnORZDO0mufY_cBsoKI0Lt_jy65rpq8RnvYgAke8_aJuDxf8UTf6fWJ8-w/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSnf9OtA74ocXn5OyMgbJ_iFmRhXGuhqbbuhaHorQ_KGeS07YWrH_AVHUATK7vwft_uA/exec';
         
         const form = document.getElementById('bookingForm');
         const paketSelect = document.getElementById('paket');
@@ -570,10 +566,13 @@
                 document.getElementById('package-' + this.value).classList.add('active');
             }
             
-            // Show/hide extra graduate option for Bestie package
+            // Bestie: sembunyikan Additional Person, tampilkan Additional Graduate
+            const extraPersonGroup = document.getElementById('extraPersonGroup');
             if (this.value === 'bestie') {
+                if (extraPersonGroup) extraPersonGroup.style.display = 'none';
                 document.getElementById('extraGraduateGroup').style.display = 'flex';
             } else {
+                if (extraPersonGroup) extraPersonGroup.style.display = 'flex';
                 document.getElementById('extraGraduateGroup').style.display = 'none';
                 extraGraduateInput.value = 0;
             }
@@ -587,17 +586,60 @@
         extraPersonInput.addEventListener('input', calculateTotal);
         extraGraduateInput.addEventListener('input', calculateTotal);
         
+        // Jumlah orang input handler - REALTIME VALIDATION + CALC
+        document.getElementById('jumlahOrang').addEventListener('input', calculateTotal);
+        
         function calculateTotal() {
             const selectedOption = paketSelect.options[paketSelect.selectedIndex];
             const packagePrice = parseInt(selectedOption.dataset.price) || 0;
+            const packageMaxPeople = parseInt(selectedOption.getAttribute('data-max-people')) || 1;
+            
+            // Jumlah orang yang diinput (TOTAL)
+            const jumlahOrangInput = parseInt(document.getElementById('jumlahOrang').value) || 1;
+            const isBestie = paketSelect.value === 'bestie';
+            
+            // AUTO-CLEAR add-on otomatis dulu
+            extraPersonInput.value = 0;
+            extraGraduateInput.value = 0;
+            let extraPersonCount = 0;
+            let extraPersonPrice = 0;
+            let extraGraduateCount = 0;
+            let extraGraduatePrice = 0;
+            
+            const warningEl = document.getElementById('maxPeopleWarning');
+            const extraOrang = Math.max(0, jumlahOrangInput - packageMaxPeople);
+            
+            if (isBestie) {
+                // BESTIE: kelebihan orang => additional GRADUATE (bukan additional person)
+                if (extraOrang > 0) {
+                    extraGraduateCount = extraOrang;
+                    extraGraduatePrice = extraGraduateCount * 275000;
+                    extraGraduateInput.value = extraGraduateCount;
+                    if (warningEl) {
+                        warningEl.textContent = `Paket Bestie maksimal 2 wisudawan. Tambahan ${extraGraduateCount} wisudawan @ Rp 275.000 = Rp ${extraGraduatePrice.toLocaleString('id-ID')}.`;
+                        warningEl.style.display = 'block';
+                    }
+                } else if (warningEl) {
+                    warningEl.style.display = 'none';
+                }
+            } else {
+                // SILVER / GOLD / PLATINUM: kelebihan orang => additional person Rp 30.000/orang
+                if (extraOrang > 0) {
+                    extraPersonCount = extraOrang;
+                    extraPersonPrice = extraPersonCount * 30000;
+                    extraPersonInput.value = extraPersonCount;
+                    if (warningEl) {
+                        warningEl.textContent = `Paket ${selectedOption.text} maksimal ${packageMaxPeople} orang. Tambahan ${extraPersonCount} orang @ Rp 30.000 = Rp ${extraPersonPrice.toLocaleString('id-ID')}.`;
+                        warningEl.style.display = 'block';
+                    }
+                } else if (warningEl) {
+                    warningEl.style.display = 'none';
+                }
+            }
             
             const cinematicPrice = cinematicCheck.checked ? 350000 : 0;
             const extraEditCount = parseInt(extraEditInput.value) || 0;
             const extraEditPrice = extraEditCount * 15000;
-            const extraPersonCount = parseInt(extraPersonInput.value) || 0;
-            const extraPersonPrice = extraPersonCount * 30000;
-            const extraGraduateCount = parseInt(extraGraduateInput.value) || 0;
-            const extraGraduatePrice = extraGraduateCount * 275000;
             
             const total = packagePrice + cinematicPrice + extraEditPrice + extraPersonPrice + extraGraduatePrice;
             
@@ -663,7 +705,6 @@
                 timestamp: new Date().toISOString(),
                 nama: document.getElementById('nama').value,
                 whatsapp: document.getElementById('whatsapp').value,
-                email: document.getElementById('email').value,
                 instagram: document.getElementById('instagram').value,
                 universitas: document.getElementById('universitas').value,
                 lokasi: document.getElementById('lokasi').value,
@@ -701,7 +742,6 @@
             message += `*Data Client:*\n`;
             message += `Nama: ${formData.nama}\n`;
             message += `WhatsApp: ${formData.whatsapp}\n`;
-            if (formData.email) message += `Email: ${formData.email}\n`;
             if (formData.instagram) message += `Instagram: ${formData.instagram}\n`;
             message += `\n*Detail Sesi:*\n`;
             message += `Universitas: ${formData.universitas}\n`;
