@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
     <title>RPXLABS Graduation Booking</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +15,9 @@
             --bg: #000000;
             --text: #f0f0f0;
             --muted: #9d9daa;
-            --lime: #d7ff43;
             --purple: #a855f7;
             --purple-deep: #7c3aed;
+            --purple-glow: rgba(168, 85, 247, 0.6);
             --line: rgba(168, 85, 247, 0.22);
             --line-strong: rgba(168, 85, 247, 0.45);
             --glass: linear-gradient(160deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.018) 45%, rgba(255,255,255,0.008) 100%);
@@ -48,7 +49,7 @@
             background:
                 radial-gradient(900px 520px at 12% -12%, rgba(168, 85, 247, 0.17), transparent 62%),
                 radial-gradient(760px 460px at 104% 12%, rgba(124, 58, 237, 0.13), transparent 66%),
-                radial-gradient(640px 420px at 50% 112%, rgba(215, 255, 67, 0.05), transparent 72%);
+                radial-gradient(640px 420px at 50% 112%, rgba(124, 58, 237, 0.12), transparent 72%);
         }
 
         h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; }
@@ -124,7 +125,7 @@
             width: 76px;
             height: 2px;
             border-radius: 2px;
-            background: linear-gradient(90deg, var(--purple), rgba(215, 255, 67, 0.85), transparent);
+            background: linear-gradient(90deg, var(--purple), var(--purple-deep), transparent);
             box-shadow: 0 0 14px rgba(168, 85, 247, 0.65);
         }
 
@@ -209,12 +210,12 @@
         }
 
         .package-card h3 {
-            color: var(--lime);
+            color: #ffffff;
             margin-bottom: 1rem;
             font-size: 1.05rem;
             font-weight: 700;
             letter-spacing: 0.04em;
-            text-shadow: 0 0 14px rgba(215, 255, 67, 0.35);
+            text-shadow: 0 0 16px rgba(168, 85, 247, 0.65), 0 0 3px rgba(255, 255, 255, 0.3);
         }
 
         .package-card ul { list-style: none; padding-left: 0; }
@@ -231,9 +232,9 @@
             content: "\2713";
             position: absolute;
             left: 0;
-            color: var(--lime);
+            color: #ffffff;
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(215, 255, 67, 0.5);
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
         }
 
         /* ---------- ADDONS + CHECKBOXES ---------- */
@@ -267,9 +268,9 @@
         }
 
         .checkbox-group input[type="checkbox"]:checked {
-            background-color: var(--lime);
-            border-color: var(--lime);
-            box-shadow: 0 0 0 3px rgba(215, 255, 67, 0.15), 0 0 20px rgba(215, 255, 67, 0.4);
+            background-color: var(--purple);
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2), 0 0 20px rgba(168, 85, 247, 0.55);
         }
 
         .checkbox-group input[type="checkbox"]:checked::after {
@@ -383,29 +384,53 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 22px rgba(168, 85, 247, 0.16);
         }
 
-        .payment-method strong { color: var(--lime); font-weight: 700; }
+        .payment-method strong {
+            color: #ffffff;
+            font-weight: 700;
+            text-shadow: 0 0 12px rgba(168, 85, 247, 0.65);
+        }
+        .account-number {
+            color: #ffffff !important;
+            text-decoration: none !important;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 14px rgba(168, 85, 247, 0.55);
+        }
+        /* Anti mobile auto-link styling */
+        a[href^="tel"], .payment-method a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
 
         /* ---------- BUTTON ---------- */
         .btn {
             width: 100%;
-            padding: 1rem;
+            padding: 1.05rem;
             margin-top: 10px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(90deg, #d7ff43 0%, #b8e830 100%);
-            color: #050505;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 14px;
+            background: #ffffff;
+            color: #0a0a12;
             font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
+            font-weight: 800;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 30px rgba(215, 255, 67, 0.22), 0 10px 26px rgba(0, 0, 0, 0.5);
+            box-shadow:
+                0 0 26px rgba(168, 85, 247, 0.45),
+                0 0 54px rgba(168, 85, 247, 0.25),
+                0 10px 28px rgba(0, 0, 0, 0.6);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 44px rgba(215, 255, 67, 0.34), 0 14px 32px rgba(0, 0, 0, 0.55);
+            background: #ffffff;
+            border-color: rgba(255, 255, 255, 0.7);
+            box-shadow:
+                0 0 36px rgba(168, 85, 247, 0.7),
+                0 0 70px rgba(168, 85, 247, 0.4),
+                0 14px 34px rgba(0, 0, 0, 0.65);
         }
 
         .btn:active { transform: scale(0.985); }
@@ -535,7 +560,7 @@
             <div class="form-group">
                 <label>Jumlah Orang yang Difoto <span class="required">*</span></label>
                 <input type="number" id="jumlahOrang" name="jumlahOrang" min="1" required placeholder="Jumlah orang">
-                <div id="maxPeopleWarning" style="display: none; background: #2a2a1a; color: #d7ff43; padding: 10px; margin-top: 8px; font-size: 12px; border-left: 3px solid #d7ff43; border-radius: 3px;"></div>
+                <div id="maxPeopleWarning" style="display: none; background: rgba(168, 85, 247, 0.12); color: #ded9f7; padding: 10px; margin-top: 8px; font-size: 12px; border-left: 3px solid #a855f7; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.25); border-left-width: 3px;"></div>
             </div>
             
             <h2>📸 Detail Sesi</h2>
@@ -642,7 +667,7 @@
                     <span id="totalPrice">Rp 0</span>
                 </div>
                 <div style="border-top: 1px solid #333; margin-top: 15px; padding-top: 15px; font-size: 13px;">
-                    <div class="price-line" id="dpPaymentLine" style="display: none; color: #d7ff43;">
+                    <div class="price-line" id="dpPaymentLine" style="display: none; color: #ffffff; text-shadow: 0 0 12px rgba(168, 85, 247, 0.6);">
                         <span>DP (Dikirim sekarang):</span>
                         <span id="dpAmount">Rp 0</span>
                     </div>
@@ -679,7 +704,7 @@
                 <h3>💳 Metode Pembayaran DP</h3>
                 
                 <div style="text-align: center; margin: 20px 0; padding: 20px; background: #1a1a1a; border-radius: 8px;">
-                    <strong style="display: block; margin-bottom: 15px; color: #d7ff43;">QRIS - Scan untuk Bayar</strong>
+                    <strong style="display: block; margin-bottom: 15px; color: #ffffff; text-shadow: 0 0 14px rgba(168, 85, 247, 0.65);">QRIS - Scan untuk Bayar</strong>
                     <img src="https://lh3.googleusercontent.com/d/1XwBIsop5sVxaZ8FA-iJyY8Q1bl23bR9z=w1000" 
                          alt="QRIS RPXLABS" 
                          style="max-width: 300px; width: 100%; border: 2px solid #333; border-radius: 8px; background: white; padding: 10px;">
@@ -687,7 +712,7 @@
                 </div>
                 
                 <div class="payment-method">
-                    <strong>BCA:</strong> 6695401021<br>
+                    <strong>BCA:</strong> <span class="account-number">6695401021</span><br>
                     a/n A. Rifko Perdana Putra
                 </div>
             </div>
