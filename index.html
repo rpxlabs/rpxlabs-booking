@@ -529,6 +529,19 @@
                     <span>Total Harga:</span>
                     <span id="totalPrice">Rp 0</span>
                 </div>
+                <div style="border-top: 1px solid #333; margin-top: 15px; padding-top: 15px; font-size: 13px;">
+                    <div class="price-line" id="dpPaymentLine" style="display: none; color: #d7ff43;">
+                        <span>DP (Dikirim sekarang):</span>
+                        <span id="dpAmount">Rp 0</span>
+                    </div>
+                    <div class="price-line" id="remainingLine" style="display: none; color: #ffffff;">
+                        <span><strong>Sisa Pembayaran:</strong></span>
+                        <span id="remainingPrice" style="font-weight: bold;">Rp 0</span>
+                    </div>
+                    <small style="color: #999; display: block; margin-top: 8px; font-style: italic;">
+                        💰 Sisa pembayaran wajib diselesaikan H-1 sebelum hari sesi foto
+                    </small>
+                </div>
             </div>
             
             <div class="form-group">
@@ -574,7 +587,7 @@
     
     <script>
         // KONFIGURASI: Google Apps Script Web App URL
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwshc71v00zMgTs1x0-x7XNpQOdLt5rhMUOxgafiL5dlvw-oMPERNfTFk80lH1Nt9nWRw/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqlC2xCbxjT0E6fA8skV5_UUhKsYMdshMUMnwMVMoJpiGN1GoHIro5IDcB32vJhZ5K3g/exec';
         
         const form = document.getElementById('bookingForm');
         const paketSelect = document.getElementById('paket');
@@ -592,11 +605,11 @@
         
         // Define available time slots
         const TIME_SLOTS = [
-            { value: '06:00', label: 'Slot 1: 06.00 - 07.30 (Pagi - Sunrise)' },
-            { value: '08:00', label: 'Slot 2: 08.00 - 09.30 (Pagi)' },
-            { value: '11:00', label: 'Slot 3: 11.00 - 12.30 (Siang - Indoor Recommended)' },
-            { value: '14:00', label: 'Slot 4: 14.00 - 15.30 (Sore)' },
-            { value: '16:00', label: 'Slot 5: 16.00 - 17.30 (Golden Hour)' },
+            { value: '06:00', label: '06:00 - 07:00' },
+            { value: '08:00', label: '08:00 - 09:00' },
+            { value: '11:00', label: '11:00 - 12:00' },
+            { value: '14:00', label: '14:00 - 15:00' },
+            { value: '16:00', label: '16:00 - 17:00' },
             { value: 'custom', label: 'Jam Lain (Konfirmasi via WhatsApp)' }
         ];
         
@@ -614,6 +627,13 @@
             jamSelect.disabled = true;
             
             try {
+                // Get selected paket & calculate duration
+                const selectedPaket = paketSelect.options[paketSelect.selectedIndex].text;
+                let durationMinutes = 60; // default Silver
+                if (selectedPaket.includes('Gold')) durationMinutes = 90;
+                if (selectedPaket.includes('Platinum')) durationMinutes = 120;
+                if (selectedPaket.includes('Bestie')) durationMinutes = 90;
+                
                 // Fetch booked slots from API
                 const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getSlots&date=${selectedDate}`);
                 const data = await response.json();
@@ -628,11 +648,31 @@
                     option.value = slot.value;
                     option.textContent = slot.label;
                     
-                    // Disable if slot is booked (except "custom")
-                    if (slot.value !== 'custom' && bookedSlots.includes(slot.value)) {
-                        option.disabled = true;
-                        option.textContent += ' (Sudah Terisi)';
-                        option.style.color = '#999';
+                    // Check if slot is available (except "custom")
+                    if (slot.value !== 'custom') {
+                        const [slotHours, slotMins] = slot.value.split(':').map(Number);
+                        const slotStart = new Date(2000, 0, 1, slotHours, slotMins);
+                        const slotEnd = new Date(slotStart.getTime() + durationMinutes * 60000);
+                        
+                        // Check overlap dengan booked slots + 30min jeda
+                        let isAvailable = true;
+                        for (let booked of bookedSlots) {
+                            const [bookedHours, bookedMins] = booked.startTime.split(':').map(Number);
+                            const bookedStart = new Date(2000, 0, 1, bookedHours, bookedMins);
+                            const bookedEnd = new Date(new Date(2000, 0, 1, ...booked.endTime.split(':').map(Number)).getTime() + 30 * 60000); // +30min jeda
+                            
+                            // Check overlap: slot.start < bookedEnd AND slot.end > bookedStart
+                            if (slotStart < bookedEnd && slotEnd > bookedStart) {
+                                isAvailable = false;
+                                break;
+                            }
+                        }
+                        
+                        if (!isAvailable) {
+                            option.disabled = true;
+                            option.textContent += ' (Sudah Terisi)';
+                            option.style.color = '#999';
+                        }
                     }
                     
                     jamSelect.appendChild(option);
@@ -700,6 +740,33 @@
         
         // Jumlah orang input handler - REALTIME VALIDATION + CALC
         document.getElementById('jumlahOrang').addEventListener('input', calculateTotal);
+        
+        // Nominal DP input handler - format rupiah + calc remaining
+        const nominalDPInput = document.getElementById('nominalDP');
+        nominalDPInput.addEventListener('input', function(e) {
+            // Remove non-digit
+            let value = this.value.replace(/\D/g, '');
+            
+            // Format dengan separator ribuan
+            if (value) {
+                this.value = parseInt(value).toLocaleString('id-ID');
+            }
+            
+            calculateTotal();
+        });
+        
+        // Remove separator saat focus (easier edit)
+        nominalDPInput.addEventListener('focus', function() {
+            this.value = this.value.replace(/\./g, '');
+        });
+        
+        // Re-format saat blur
+        nominalDPInput.addEventListener('blur', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value) {
+                this.value = parseInt(value).toLocaleString('id-ID');
+            }
+        });
         
         function calculateTotal() {
             const selectedOption = paketSelect.options[paketSelect.selectedIndex];
@@ -793,6 +860,22 @@
             }
             
             document.getElementById('totalPrice').textContent = formatRupiah(total);
+            
+            // Calculate DP and remaining payment
+            const dpInputValue = document.getElementById('nominalDP').value;
+            const dpAmount = dpInputValue ? parseInt(dpInputValue.replace(/\D/g, '')) : 0;
+            
+            if (dpAmount > 0) {
+                document.getElementById('dpPaymentLine').style.display = 'flex';
+                document.getElementById('dpAmount').textContent = formatRupiah(dpAmount);
+                
+                const remaining = Math.max(0, total - dpAmount);
+                document.getElementById('remainingLine').style.display = 'flex';
+                document.getElementById('remainingPrice').textContent = formatRupiah(remaining);
+            } else {
+                document.getElementById('dpPaymentLine').style.display = 'none';
+                document.getElementById('remainingLine').style.display = 'none';
+            }
         }
         
         function formatRupiah(number) {
@@ -844,7 +927,8 @@
                 extraPerson: parseInt(extraPersonInput.value) || 0,
                 extraGraduate: parseInt(extraGraduateInput.value) || 0,
                 totalHarga: document.getElementById('totalPrice').textContent,
-                nominalDP: parseInt(document.getElementById('nominalDP').value) || 0,
+                nominalDP: parseInt(document.getElementById('nominalDP').value.replace(/\D/g, '')) || 0,
+                sisaPembayaran: Math.max(0, parseInt(document.getElementById('totalPrice').textContent.replace(/\D/g, '')) - parseInt(document.getElementById('nominalDP').value.replace(/\D/g, ''))),
                 catatan: document.getElementById('catatan').value
             };
             
@@ -893,7 +977,9 @@
             
             message += `\n*Total Harga: ${formData.totalHarga}*\n`;
             message += `DP Dikirim: Rp ${formData.nominalDP.toLocaleString('id-ID')}\n`;
+            message += `Sisa Pembayaran: Rp ${formData.sisaPembayaran.toLocaleString('id-ID')}\n`;
             message += `\n📸 *WAJIB: Kirimkan bukti pembayaran DP di pesan ini setelah menekan tombol "Kirim Booking"*\n`;
+            message += `\n💰 *Sisa pembayaran wajib diselesaikan H-1 sebelum hari sesi foto*`;
             if (formData.catatan) {
                 message += `\nCatatan: ${formData.catatan}\n`;
             }
