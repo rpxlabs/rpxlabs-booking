@@ -351,8 +351,26 @@
             
             <div class="form-group">
                 <label>Universitas <span class="required">*</span></label>
-                <input type="text" id="universitas" name="universitas" required placeholder="Tulis nama lengkap (contoh: Universitas Muhammadiyah Palangkaraya)">
-                <small style="color: #999; font-size: 12px; display: block; margin-top: 4px;">⚠️ Tulis nama lengkap universitas, hindari singkatan (UMPR ❌ → Universitas Muhammadiyah Palangkaraya ✓)</small>
+                <select id="universitas" name="universitas" required>
+                    <option value="">-- Pilih Universitas --</option>
+                    <option value="UPR - Universitas Palangkaraya">UPR / Universitas Palangkaraya</option>
+                    <option value="UMPR - Universitas Muhammadiyah Palangkaraya">UMPR / Universitas Muhammadiyah Palangkaraya</option>
+                    <option value="UIN - Universitas Islam Negeri Palangkaraya">UIN / Universitas Islam Negeri Palangkaraya</option>
+                    <option value="Poltekes Palangkaraya">Poltekes Palangkaraya</option>
+                    <option value="STIE YPBK Palangkaraya">STIE YPBK Palangkaraya</option>
+                    <option value="STIE Sampit">STIE Sampit</option>
+                    <option value="UNDA - Universitas Darwan Ali Sampit">UNDA / Universitas Darwan Ali Sampit</option>
+                    <option value="UMSA - Universitas Muhammadiyah Sampit">UMSA / Universitas Muhammadiyah Sampit</option>
+                    <option value="POLISAM - Politeknik Sampit">POLISAM / Politeknik Sampit</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Nominal DP (Down Payment) <span class="required">*</span></label>
+                <input type="number" id="nominalDP" name="nominalDP" required placeholder="Contoh: 150000" min="150000">
+                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 4px;">
+                    💳 DP minimal Rp 150.000 (non-refund). Wajib kirimkan bukti pembayaran via WhatsApp setelah mengisi form ini.
+                </small>
             </div>
             
             <div class="form-group">
@@ -366,8 +384,21 @@
             </div>
             
             <div class="form-group">
-                <label>Jam Mulai <span class="required">*</span></label>
-                <input type="time" id="jam" name="jam" required>
+                <label>Pilih Slot Waktu <span class="required">*</span></label>
+                <select id="jam" name="jam" required>
+                    <option value="">-- Pilih tanggal dulu --</option>
+                </select>
+                <small style="color: #999; font-size: 12px; display: block; margin-top: 4px;">
+                    💡 Slot otomatis update berdasarkan ketersediaan tanggal yang dipilih
+                </small>
+            </div>
+            
+            <div class="form-group" id="customTimeGroup" style="display: none;">
+                <label>Jam Custom <span class="required">*</span></label>
+                <input type="time" id="jamCustom" name="jamCustom">
+                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 4px;">
+                    ⚠️ Jam custom perlu konfirmasi via WhatsApp sebelum final
+                </small>
             </div>
             
             <h2>📦 Paket & Harga</h2>
@@ -554,6 +585,86 @@
         const extraGraduateGroup = document.getElementById('extraGraduateGroup');
         const submitBtn = document.getElementById('submitBtn');
         const alertContainer = document.getElementById('alertContainer');
+        const tanggalInput = document.getElementById('tanggal');
+        const jamSelect = document.getElementById('jam');
+        const customTimeGroup = document.getElementById('customTimeGroup');
+        const jamCustomInput = document.getElementById('jamCustom');
+        
+        // Define available time slots
+        const TIME_SLOTS = [
+            { value: '06:00', label: 'Slot 1: 06.00 - 07.30 (Pagi - Sunrise)' },
+            { value: '08:00', label: 'Slot 2: 08.00 - 09.30 (Pagi)' },
+            { value: '11:00', label: 'Slot 3: 11.00 - 12.30 (Siang - Indoor Recommended)' },
+            { value: '14:00', label: 'Slot 4: 14.00 - 15.30 (Sore)' },
+            { value: '16:00', label: 'Slot 5: 16.00 - 17.30 (Golden Hour)' },
+            { value: 'custom', label: 'Jam Lain (Konfirmasi via WhatsApp)' }
+        ];
+        
+        // Fetch available slots when date changes
+        tanggalInput.addEventListener('change', async function() {
+            const selectedDate = this.value;
+            
+            if (!selectedDate) {
+                jamSelect.innerHTML = '<option value="">-- Pilih tanggal dulu --</option>';
+                return;
+            }
+            
+            // Show loading
+            jamSelect.innerHTML = '<option value="">Memuat slot...</option>';
+            jamSelect.disabled = true;
+            
+            try {
+                // Fetch booked slots from API
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getSlots&date=${selectedDate}`);
+                const data = await response.json();
+                
+                const bookedSlots = data.success ? data.bookedSlots : [];
+                
+                // Populate dropdown
+                jamSelect.innerHTML = '<option value="">-- Pilih slot waktu --</option>';
+                
+                TIME_SLOTS.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot.value;
+                    option.textContent = slot.label;
+                    
+                    // Disable if slot is booked (except "custom")
+                    if (slot.value !== 'custom' && bookedSlots.includes(slot.value)) {
+                        option.disabled = true;
+                        option.textContent += ' (Sudah Terisi)';
+                        option.style.color = '#999';
+                    }
+                    
+                    jamSelect.appendChild(option);
+                });
+                
+                jamSelect.disabled = false;
+                
+            } catch (error) {
+                console.error('Error fetching slots:', error);
+                // Fallback: show all slots
+                jamSelect.innerHTML = '<option value="">-- Pilih slot waktu --</option>';
+                TIME_SLOTS.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot.value;
+                    option.textContent = slot.label;
+                    jamSelect.appendChild(option);
+                });
+                jamSelect.disabled = false;
+            }
+        });
+        
+        // Show/hide custom time input
+        jamSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customTimeGroup.style.display = 'block';
+                jamCustomInput.required = true;
+            } else {
+                customTimeGroup.style.display = 'none';
+                jamCustomInput.required = false;
+                jamCustomInput.value = '';
+            }
+        });
         
         // Package selection handler
         paketSelect.addEventListener('change', function() {
@@ -702,6 +813,21 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Mengirim...';
             
+            // Get jam value (handle custom time)
+            const selectedJam = document.getElementById('jam').value;
+            let finalJam = selectedJam;
+            
+            if (selectedJam === 'custom') {
+                const customJam = document.getElementById('jamCustom').value;
+                if (!customJam) {
+                    showAlert('⚠️ Silakan isi jam custom atau pilih slot lainnya', 'warning');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Kirim Booking';
+                    return;
+                }
+                finalJam = customJam + ' (Custom)';
+            }
+            
             const formData = {
                 timestamp: new Date().toISOString(),
                 nama: document.getElementById('nama').value,
@@ -710,7 +836,7 @@
                 universitas: document.getElementById('universitas').value,
                 lokasi: document.getElementById('lokasi').value,
                 tanggal: document.getElementById('tanggal').value,
-                jam: document.getElementById('jam').value,
+                jam: finalJam,
                 paket: paketSelect.options[paketSelect.selectedIndex].text,
                 jumlahOrang: document.getElementById('jumlahOrang').value,
                 cinematicVideo: cinematicCheck.checked ? 'Ya' : 'Tidak',
@@ -718,6 +844,7 @@
                 extraPerson: parseInt(extraPersonInput.value) || 0,
                 extraGraduate: parseInt(extraGraduateInput.value) || 0,
                 totalHarga: document.getElementById('totalPrice').textContent,
+                nominalDP: parseInt(document.getElementById('nominalDP').value) || 0,
                 catatan: document.getElementById('catatan').value
             };
             
@@ -765,7 +892,8 @@
             }
             
             message += `\n*Total Harga: ${formData.totalHarga}*\n`;
-            message += `DP Minimal: Rp 150.000\n`;
+            message += `DP Dikirim: Rp ${formData.nominalDP.toLocaleString('id-ID')}\n`;
+            message += `\n📸 *WAJIB: Kirimkan bukti pembayaran DP di pesan ini setelah menekan tombol "Kirim Booking"*\n`;
             if (formData.catatan) {
                 message += `\nCatatan: ${formData.catatan}\n`;
             }
