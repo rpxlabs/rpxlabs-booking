@@ -347,60 +347,6 @@
                 <input type="text" id="instagram" name="instagram" placeholder="@username">
             </div>
             
-            <h2>📸 Detail Sesi</h2>
-            
-            <div class="form-group">
-                <label>Universitas <span class="required">*</span></label>
-                <select id="universitas" name="universitas" required>
-                    <option value="">-- Pilih Universitas --</option>
-                    <option value="UPR - Universitas Palangkaraya">UPR / Universitas Palangkaraya</option>
-                    <option value="UMPR - Universitas Muhammadiyah Palangkaraya">UMPR / Universitas Muhammadiyah Palangkaraya</option>
-                    <option value="UIN - Universitas Islam Negeri Palangkaraya">UIN / Universitas Islam Negeri Palangkaraya</option>
-                    <option value="Poltekes Palangkaraya">Poltekes Palangkaraya</option>
-                    <option value="STIE YPBK Palangkaraya">STIE YPBK Palangkaraya</option>
-                    <option value="STIE Sampit">STIE Sampit</option>
-                    <option value="UNDA - Universitas Darwan Ali Sampit">UNDA / Universitas Darwan Ali Sampit</option>
-                    <option value="UMSA - Universitas Muhammadiyah Sampit">UMSA / Universitas Muhammadiyah Sampit</option>
-                    <option value="POLISAM - Politeknik Sampit">POLISAM / Politeknik Sampit</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Nominal DP (Down Payment) <span class="required">*</span></label>
-                <input type="number" id="nominalDP" name="nominalDP" required placeholder="Contoh: 150000" min="150000">
-                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 4px;">
-                    💳 DP minimal Rp 150.000 (non-refund). Wajib kirimkan bukti pembayaran via WhatsApp setelah mengisi form ini.
-                </small>
-            </div>
-            
-            <div class="form-group">
-                <label>Lokasi Foto <span class="required">*</span></label>
-                <input type="text" id="lokasi" name="lokasi" required placeholder="Contoh: Kampus utama, Auditorium, dll">
-            </div>
-            
-            <div class="form-group">
-                <label>Tanggal Sesi <span class="required">*</span></label>
-                <input type="date" id="tanggal" name="tanggal" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Pilih Slot Waktu <span class="required">*</span></label>
-                <select id="jam" name="jam" required>
-                    <option value="">-- Pilih tanggal dulu --</option>
-                </select>
-                <small style="color: #999; font-size: 12px; display: block; margin-top: 4px;">
-                    💡 Slot otomatis update berdasarkan ketersediaan tanggal yang dipilih
-                </small>
-            </div>
-            
-            <div class="form-group" id="customTimeGroup" style="display: none;">
-                <label>Jam Custom <span class="required">*</span></label>
-                <input type="time" id="jamCustom" name="jamCustom">
-                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 4px;">
-                    ⚠️ Jam custom perlu konfirmasi via WhatsApp sebelum final
-                </small>
-            </div>
-            
             <h2>📦 Paket & Harga</h2>
             
             <div class="form-group">
@@ -478,6 +424,60 @@
                 <label>Jumlah Orang yang Difoto <span class="required">*</span></label>
                 <input type="number" id="jumlahOrang" name="jumlahOrang" min="1" required placeholder="Jumlah orang">
                 <div id="maxPeopleWarning" style="display: none; background: #2a2a1a; color: #d7ff43; padding: 10px; margin-top: 8px; font-size: 12px; border-left: 3px solid #d7ff43; border-radius: 3px;"></div>
+            </div>
+            
+            <h2>📸 Detail Sesi</h2>
+            
+            <div class="form-group">
+                <label>Universitas <span class="required">*</span></label>
+                <select id="universitas" name="universitas" required>
+                    <option value="">-- Pilih Universitas --</option>
+                    <option value="UPR - Universitas Palangkaraya">UPR / Universitas Palangkaraya</option>
+                    <option value="UMPR - Universitas Muhammadiyah Palangkaraya">UMPR / Universitas Muhammadiyah Palangkaraya</option>
+                    <option value="UIN - Universitas Islam Negeri Palangkaraya">UIN / Universitas Islam Negeri Palangkaraya</option>
+                    <option value="Poltekes Palangkaraya">Poltekes Palangkaraya</option>
+                    <option value="STIE YPBK Palangkaraya">STIE YPBK Palangkaraya</option>
+                    <option value="STIE Sampit">STIE Sampit</option>
+                    <option value="UNDA - Universitas Darwan Ali Sampit">UNDA / Universitas Darwan Ali Sampit</option>
+                    <option value="UMSA - Universitas Muhammadiyah Sampit">UMSA / Universitas Muhammadiyah Sampit</option>
+                    <option value="POLISAM - Politeknik Sampit">POLISAM / Politeknik Sampit</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Nominal DP (Down Payment) <span class="required">*</span></label>
+                <input type="text" id="nominalDP" name="nominalDP" required placeholder="Contoh: 150000">
+                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 4px;">
+                    💳 DP minimal Rp 150.000 (non-refund). Kirimkan bukti pembayaran via WhatsApp setelah mengisi form ini.
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label>Lokasi Foto <span class="required">*</span></label>
+                <input type="text" id="lokasi" name="lokasi" required placeholder="Contoh: Kampus utama, Auditorium, dll">
+            </div>
+            
+            <div class="form-group">
+                <label>Tanggal Sesi <span class="required">*</span></label>
+                <input type="date" id="tanggal" name="tanggal" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Pilih Slot Waktu <span class="required">*</span></label>
+                <select id="jam" name="jam" required>
+                    <option value="">-- Pilih tanggal dulu --</option>
+                </select>
+                <small style="color: #999; font-size: 12px; display: block; margin-top: 4px;">
+                    💡 Slot otomatis update berdasarkan ketersediaan tanggal yang dipilih
+                </small>
+            </div>
+            
+            <div class="form-group" id="customTimeGroup" style="display: none;">
+                <label>Jam Custom <span class="required">*</span></label>
+                <input type="time" id="jamCustom" name="jamCustom">
+                <small style="color: #ff9800; font-size: 12px; display: block; margin-top: 4px;">
+                    ⚠️ Jam custom perlu konfirmasi via WhatsApp sebelum final
+                </small>
             </div>
             
             <h2>➕ Add-Ons</h2>
@@ -587,7 +587,7 @@
     
     <script>
         // KONFIGURASI: Google Apps Script Web App URL
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqlC2xCbxjT0E6fA8skV5_UUhKsYMdshMUMnwMVMoJpiGN1GoHIro5IDcB32vJhZ5K3g/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxep5UVzZ5k5SuVzo9ghYnzbsRzQ7anjC0oVWKWi64aYw0F9eMWFWNXUEC25bfqgWrX/exec';
         
         const form = document.getElementById('bookingForm');
         const paketSelect = document.getElementById('paket');
@@ -603,15 +603,43 @@
         const customTimeGroup = document.getElementById('customTimeGroup');
         const jamCustomInput = document.getElementById('jamCustom');
         
-        // Define available time slots
-        const TIME_SLOTS = [
-            { value: '06:00', label: '06:00 - 07:00' },
-            { value: '08:00', label: '08:00 - 09:00' },
-            { value: '11:00', label: '11:00 - 12:00' },
-            { value: '14:00', label: '14:00 - 15:00' },
-            { value: '16:00', label: '16:00 - 17:00' },
-            { value: 'custom', label: 'Jam Lain (Konfirmasi via WhatsApp)' }
-        ];
+        // Generate available time slots dari 05:00 - 17:00 setiap 30 menit
+        function generateTimeSlots() {
+            const slots = [];
+            for (let hour = 5; hour <= 17; hour++) {
+                for (let min of [0, 30]) {
+                    if (hour === 17 && min === 30) break; // Stop at 17:00
+                    const timeStr = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+                    slots.push({
+                        value: timeStr,
+                        label: timeStr
+                    });
+                }
+            }
+            slots.push({ value: 'custom', label: 'Jam Lain (Konfirmasi via WhatsApp)' });
+            return slots;
+        }
+        
+        const TIME_SLOTS = generateTimeSlots();
+        
+        // Disable tanggal/jam sampai paket dipilih
+        tanggalInput.disabled = true;
+        jamSelect.disabled = true;
+        
+        // Enable tanggal ketika paket dipilih
+        paketSelect.addEventListener('change', function() {
+            if (this.value) {
+                tanggalInput.disabled = false;
+                // Re-fetch slots kalau tanggal sudah dipilih
+                if (tanggalInput.value) {
+                    tanggalInput.dispatchEvent(new Event('change'));
+                }
+            } else {
+                tanggalInput.disabled = true;
+                jamSelect.disabled = true;
+                jamSelect.innerHTML = '<option value="">-- Pilih paket & tanggal dulu --</option>';
+            }
+        });
         
         // Fetch available slots when date changes
         tanggalInput.addEventListener('change', async function() {
@@ -646,7 +674,18 @@
                 TIME_SLOTS.forEach(slot => {
                     const option = document.createElement('option');
                     option.value = slot.value;
-                    option.textContent = slot.label;
+                    
+                    if (slot.value === 'custom') {
+                        option.textContent = slot.label;
+                    } else {
+                        // Tampilkan start - end time sesuai durasi paket
+                        const [slotHours, slotMins] = slot.value.split(':').map(Number);
+                        const slotStart = new Date(2000, 0, 1, slotHours, slotMins);
+                        const slotEnd = new Date(slotStart.getTime() + durationMinutes * 60000);
+                        const endStr = `${String(slotEnd.getHours()).padStart(2, '0')}:${String(slotEnd.getMinutes()).padStart(2, '0')}`;
+                        
+                        option.textContent = `${slot.value} - ${endStr}`;
+                    }
                     
                     // Check if slot is available (except "custom")
                     if (slot.value !== 'custom') {
@@ -682,12 +721,23 @@
                 
             } catch (error) {
                 console.error('Error fetching slots:', error);
-                // Fallback: show all slots
+                // Fallback: show all slots (tanpa cek availability)
                 jamSelect.innerHTML = '<option value="">-- Pilih slot waktu --</option>';
                 TIME_SLOTS.forEach(slot => {
                     const option = document.createElement('option');
                     option.value = slot.value;
-                    option.textContent = slot.label;
+                    
+                    if (slot.value === 'custom') {
+                        option.textContent = slot.label;
+                    } else {
+                        // Tampilkan start - end time
+                        const [slotHours, slotMins] = slot.value.split(':').map(Number);
+                        const slotStart = new Date(2000, 0, 1, slotHours, slotMins);
+                        const slotEnd = new Date(slotStart.getTime() + durationMinutes * 60000);
+                        const endStr = `${String(slotEnd.getHours()).padStart(2, '0')}:${String(slotEnd.getMinutes()).padStart(2, '0')}`;
+                        option.textContent = `${slot.value} - ${endStr}`;
+                    }
+                    
                     jamSelect.appendChild(option);
                 });
                 jamSelect.disabled = false;
