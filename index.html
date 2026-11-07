@@ -704,7 +704,9 @@
                     <option value="UNDA - Universitas Darwan Ali Sampit">UNDA / Universitas Darwan Ali Sampit</option>
                     <option value="UMSA - Universitas Muhammadiyah Sampit">UMSA / Universitas Muhammadiyah Sampit</option>
                     <option value="POLISAM - Politeknik Sampit">POLISAM / Politeknik Sampit</option>
+                    <option value="__custom__">Lainnya (isi manual)</option>
                 </select>
+                <input type="text" id="universitasCustom" name="universitasCustom" placeholder="Tulis nama kampus / universitas..." style="display: none; margin-top: 0.6rem;">
             </div>
             
             <div class="form-group">
@@ -873,6 +875,20 @@
         const jamSelect = document.getElementById('jam');
         const customTimeGroup = document.getElementById('customTimeGroup');
         const jamCustomInput = document.getElementById('jamCustom');
+        const universitasSelect = document.getElementById('universitas');
+        const universitasCustomInput = document.getElementById('universitasCustom');
+        
+        // Toggle custom universitas input
+        universitasSelect.addEventListener('change', function() {
+            if (this.value === '__custom__') {
+                universitasCustomInput.style.display = 'block';
+                universitasCustomInput.required = true;
+            } else {
+                universitasCustomInput.style.display = 'none';
+                universitasCustomInput.required = false;
+                universitasCustomInput.value = '';
+            }
+        });
         
         // Generate available time slots dari 05:00 - 17:00 setiap 30 menit
         function generateTimeSlots() {
@@ -1427,12 +1443,26 @@
                 finalJam = customJam + ' (Custom)';
             }
             
+            // Get universitas value (handle custom)
+            const selectedUniversitas = document.getElementById('universitas').value;
+            let finalUniversitas = selectedUniversitas;
+            if (selectedUniversitas === '__custom__') {
+                const customUniversitas = document.getElementById('universitasCustom').value.trim();
+                if (!customUniversitas) {
+                    showAlert('⚠️ Silakan isi nama universitas/kampus', 'warning');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Kirim Booking';
+                    return;
+                }
+                finalUniversitas = customUniversitas;
+            }
+            
             const formData = {
                 timestamp: new Date().toISOString(),
                 nama: document.getElementById('nama').value,
                 whatsapp: document.getElementById('whatsapp').value,
                 instagram: document.getElementById('instagram').value,
-                universitas: document.getElementById('universitas').value,
+                universitas: finalUniversitas,
                 lokasi: document.getElementById('lokasi').value,
                 tanggal: document.getElementById('tanggal').value,
                 jam: finalJam,
