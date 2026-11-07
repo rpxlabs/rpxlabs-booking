@@ -546,6 +546,17 @@
             <h1>Graduation Booking Form</h1>
         </div>
         
+        <!-- High-Demand Dates Banner -->
+        <div id="highDemandBanner" style="display: none; margin-bottom: 2rem;">
+            <div style="background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 1.5rem; overflow: hidden;">
+                <div style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                    <span style="font-size: 1.3rem; margin-right: 0.6rem;">🔥</span>
+                    <h3 style="margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #ffffff;">Jadwal Peak Season</h3>
+                </div>
+                <div id="highDemandCards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;"></div>
+            </div>
+        </div>
+        
         <form id="bookingForm">
             <h2><ph-icon class="ph ph-clipboard-text" style="color: #ffffff; margin-right: 0.4rem; font-size: 0.9em;"></ph-icon>Data Client</h2>
             
@@ -707,6 +718,7 @@
             <div class="form-group">
                 <label>Tanggal Sesi <span class="required">*</span></label>
                 <input type="date" id="tanggal" name="tanggal" required>
+                <div id="dateCapacityBadge" style="margin-top: 0.8rem; display: none;"></div>
             </div>
             
             <div class="form-group">
@@ -875,6 +887,66 @@
         
         const TIME_SLOTS = generateTimeSlots();
         
+        // Fetch high-demand dates on page load
+        const highDemandBanner = document.getElementById('highDemandBanner');
+        const highDemandCards = document.getElementById('highDemandCards');
+        const dateCapacityBadge = document.getElementById('dateCapacityBadge');
+        
+        async function fetchHighDemandDates() {
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getHighDemand`);
+                const data = await response.json();
+                
+                if (data.success && data.highDemand && data.highDemand.length > 0) {
+                    highDemandCards.innerHTML = data.highDemand.map(item => `
+                        <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 1rem; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('tanggal').value='${item.date}'; document.getElementById('tanggal').dispatchEvent(new Event('change', {bubbles:true}));">
+                            <div style="font-size: 0.85rem; color: #9d9daa; margin-bottom: 0.4rem;">${new Date(item.date).toLocaleDateString('id-ID', {month:'short', day:'numeric'})}</div>
+                            <div style="font-size: 0.9rem; font-weight: 600; color: #ffffff; margin-bottom: 0.6rem;">${item.universitas}</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                                <span style="color: ${item.status === 'FULL' ? '#ff8b80' : '#d7ff43'};">${item.status === 'FULL' ? '❌ Penuh' : '⚠️ ' + item.available + ' slot'}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                    highDemandBanner.style.display = 'block';
+                    
+                    // Store high-demand dates for badge lookup
+                    window.highDemandMap = {};
+                    data.highDemand.forEach(item => {
+                        window.highDemandMap[item.date] = item;
+                    });
+                }
+            } catch (err) {
+                console.log('High-demand fetch skip:', err.message);
+            }
+        }
+        
+        // Show capacity badge on date change
+        tanggalInput.addEventListener('change', function() {
+            const selectedDate = this.value;
+            if (!selectedDate || !window.highDemandMap) {
+                dateCapacityBadge.style.display = 'none';
+                return;
+            }
+            
+            const item = window.highDemandMap[selectedDate];
+            if (item) {
+                const color = item.status === 'FULL' ? '#ff8b80' : (item.status === 'HIGH' ? '#ff9800' : '#d7ff43');
+                const icon = item.status === 'FULL' ? '❌' : '⚠️';
+                const text = item.status === 'FULL' ? 'Penuh - Jadwal ini sudah booking maksimal' : `${icon} Peak day - sisa ${item.available} dari 4 slot\n🎓 ${item.universitas} (Wisuda)`;
+                
+                dateCapacityBadge.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.08); border: 1px solid ${color}40; border-left: 3px solid ${color}; border-radius: 6px; padding: 0.8rem; font-size: 0.85rem; color: ${color}; line-height: 1.4;">
+                        ${text}
+                    </div>
+                `;
+                dateCapacityBadge.style.display = 'block';
+            } else {
+                dateCapacityBadge.style.display = 'none';
+            }
+        });
+        
+        // Load high-demand dates on page load
+        fetchHighDemandDates();
         // Disable tanggal/jam sampai paket dipilih
         tanggalInput.disabled = true;
         jamSelect.disabled = true;
